@@ -11,10 +11,11 @@ import stage
 def game_scene():
     # Finds if a number is associated with a month
 
-    print("\n\n\n")
-    print("Hello, World!")
-
-    print("\nDone.")
+    image_blank_background = stage.Bank.from_bmp16("space_aliens_background.bmp")
+    background = stage.Grid("image_blank_background, 10, 8")
+    game = stage.Stage(ugame.display, 60)
+    game.layers = [background]
+    game.render_block()
 
 
 if __name__ == "__main__":
