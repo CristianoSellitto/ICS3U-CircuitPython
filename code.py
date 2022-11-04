@@ -6,6 +6,7 @@
 
 import stage
 import ugame
+import constants
 
 
 def game_scene():
@@ -13,10 +14,10 @@ def game_scene():
 
     image_bank_background = stage.Bank.from_bmp16("space_aliens_background.bmp")
     image_bank_sprites = stage.Bank.from_bmp16("space_aliens.bmp")
-    background = stage.Grid(image_bank_background, 10, 8)
-    ship = stage.Sprite(image_bank_sprites, 5, 75, 66)
+    background = stage.Grid(image_bank_background, constants.SCREEN_GRID_X, constants.SCREEN_GRID_Y)
+    ship = stage.Sprite(image_bank_sprites, 5, 75, constants.SCREEN_Y - (2 * constants.SPRITE_SIZE))
 
-    game = stage.Stage(ugame.display, 60)
+    game = stage.Stage(ugame.display, constants.FPS)
     game.layers = [ship] + [background]
     game.render_block()
 
@@ -25,21 +26,27 @@ def game_scene():
         keys = ugame.buttons.get_pressed()
 
         if keys & ugame.K_X:
-            print("A")
+            pass
         if keys & ugame.K_O:
-            print("B")
+            pass
         if keys & ugame.K_START:
-            print("Start")
+            pass
         if keys & ugame.K_SELECT:
-            print("Select")
+            pass
         if keys & ugame.K_RIGHT:
-            ship.move(ship.x + 1, ship.y)
+            if ship.x <= constants.SCREEN_X - constants.SPRITE_SIZE:
+                ship.move((ship.x + constants.SPRITE_MOVEMENT_SPEED), ship.y)
+            else:
+                ship.move(constants.SCREEN_X - constants.SPRITE_SIZE, ship.y)
         if keys & ugame.K_LEFT:
-            ship.move(ship.x - 1, ship.y)
+            if ship.x >= 0:
+                ship.move((ship.x - constants.SPRITE_MOVEMENT_SPEED), ship.y)
+            else:
+                ship.move(0, ship.y)
         if keys & ugame.K_UP:
-            ship.move(ship.x, ship.y - 1)
+            pass
         if keys & ugame.K_DOWN:
-            ship.move(ship.x, ship.y + 1)
+            pass
 
         # Game logic
 
