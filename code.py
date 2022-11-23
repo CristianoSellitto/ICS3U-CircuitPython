@@ -135,6 +135,9 @@ def menu_scene():
 def game_scene():
     # A function for the Game Scene
 
+    # Score Variable
+    score = 0
+
     def show_alien():
         for alien_number in range(len(aliens)):
             if aliens[alien_number].x < 0:
@@ -155,8 +158,9 @@ def game_scene():
     start_button = constants.button_state["button_up"]
     select_button = constants.button_state["button_up"]
 
-    # Sound Variable
+    # Sound Variables
     pew_sound = open("pew.wav", 'rb')
+    boom_sound = open("boom.wav", 'rb')
     sound = ugame.audio
     sound.stop()
     sound.mute(False)
@@ -225,6 +229,10 @@ def game_scene():
         if keys & ugame.K_DOWN != 0:
             pass
 
+        # Game logic
+        if a_button == constants.button_state["button_just_pressed"]:
+            sound.play(pew_sound)
+
         if a_button == constants.button_state["button_just_pressed"]:
             for laser_number in range(len(lasers)):
                 if lasers[laser_number].x < 0:
@@ -245,9 +253,19 @@ def game_scene():
                     aliens[alien_number].move(constants.OFF_SCREEN_X, constants.OFF_SCREEN_Y)
                     show_alien()
 
-        # Game logic
-        if a_button == constants.button_state["button_just_pressed"]:
-            sound.play(pew_sound)
+        for laser_number in range(len(lasers)):
+            for alien_number in range(len(aliens)):
+                if stage.collide(lasers[laser_number].x, lasers[laser_number].y,
+                                 lasers[laser_number].x + 16, lasers[laser_number].y + 16,
+                                 aliens[alien_number].x, aliens[alien_number].y,
+                                 aliens[alien_number].x + 16, aliens[alien_number].y + 16):
+                    aliens[alien_number].move(constants.OFF_SCREEN_X, constants.OFF_SCREEN_Y)
+                    lasers[laser_number].move(constants.OFF_SCREEN_X, constants.OFF_SCREEN_Y)
+                    sound.stop()
+                    sound.play(boom_sound)
+                    show_alien()
+                    show_alien()
+                    score = score + 1
 
         # Redraw sprites
         game.render_sprites(lasers + [ship] + aliens)
