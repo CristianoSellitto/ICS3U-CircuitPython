@@ -8,6 +8,8 @@ import stage
 import ugame
 import time
 import random
+import supervisor
+
 import constants
 
 
@@ -167,6 +169,7 @@ def game_scene():
     # Sound Variables
     pew_sound = open("pew.wav", 'rb')
     boom_sound = open("boom.wav", 'rb')
+    crash_sound = open("crash.wav", 'rb')
     sound = ugame.audio
     sound.stop()
     sound.mute(False)
@@ -284,8 +287,62 @@ def game_scene():
                     score_text.move(1, 1)
                     score_text.text("Score: {0}".format(score))
 
-        # Redraw sprites
+        for alien_number in range(len(aliens)):
+            if aliens[alien_number].x > 0:
+                if stage.collide(aliens[alien_number].x + 1, aliens[alien_number].y,
+                                 aliens[alien_number].x + 15, aliens[alien_number].y + 15,
+                                 ship.x, ship.y,
+                                 ship.x + 15, ship.y + 15):
+                    sound.stop()
+                    sound.play(crash_sound)
+                    time.sleep(3.0)
+                    game_over_scene(score)
+
+        # Redraw spritess
         game.render_sprites(lasers + [ship] + aliens)
+        game.tick()
+
+
+def game_over_scene(final_score):
+    # A function for the Game Over Scene
+
+    # Image Bank
+    image_bank_two = stage.Bank.from_bmp16("mt_game_studio.bmp")
+
+    # Sprite Variable
+    background = stage.Grid(image_bank_two, constants.SCREEN_GRID_X, constants.SCREEN_GRID_Y)
+
+    # Text Ojects
+    text = []
+    text1 = stage.Text(width=29, height=14, font=None, palette=constants.BLUE_PALETTE, buffer=None)
+    text1.move(22, 20)
+    text1.text("Final Score: {:0>2d}".format(final_score))
+    text.append(text1)
+
+    text2 = stage.Text(width=29, height=14, font=None, palette=constants.BLUE_PALETTE, buffer=None)
+    text2.move(43, 60)
+    text2.text("GAME OVER")
+    text.append(text2)
+
+    text3 = stage.Text(width=29, height=14, font=None, palette=constants.BLUE_PALETTE, buffer=None)
+    text3.move(32, 110)
+    text3.text("PRESS SELECT")
+    text.append(text3)
+
+    game = stage.Stage(ugame.display, constants.FPS)
+    game.layers = text + [background]
+    game.render_block()
+
+    while True:
+        # User Inputs
+
+        keys = ugame.buttons.get_pressed()
+
+        # Select Button
+        if keys & ugame.K_SELECT != 0:
+            supervisor.reload()
+            
+        # Game Logic
         game.tick()
 
 
